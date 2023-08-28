@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTimer } from "react-timer-hook";
 
-function Timer() {
+export default function MyTimer() {
   const [selectedMinutes, setSelectedMinutes] = useState(5);
 
   const handleMinutesChange = (event) => {
@@ -49,5 +49,3 @@ function Timer() {
     </div>
   );
 }
-
-export default Timer;

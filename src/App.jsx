@@ -1,4 +1,5 @@
 import "./App.css";
+import MyTimer from "./components/Timer";
 
 function App() {
   return (
@@ -8,6 +9,9 @@ function App() {
       </header>
       <div className="App-body">
         <p>Timer</p>
+        {/* <Timer /> */}
+
+        <MyTimer />
         <p>Stopwatch</p>
       </div>
     </div>

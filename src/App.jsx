@@ -8,11 +8,11 @@ function App() {
         <p>Timer and Stopwatch</p>
       </header>
       <div className="App-body">
-        <p>Timer</p>
+        <p className="title">Timer</p>
         {/* <Timer /> */}
 
         <MyTimer />
-        <p>Stopwatch</p>
+        <p className="title">Stopwatch</p>
       </div>
     </div>
   );

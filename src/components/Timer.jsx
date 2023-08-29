@@ -54,12 +54,13 @@ export default function MyTimer() {
 
   const formatTime = (time) => {
     const padTime = (time) => time.toString().padStart(2, "0");
-    const minutes = Math.floor(time / 60000);
+    const days = Math.floor(time / 86400000);
+    const hours = Math.floor((time % 86400000) / 3600000);
+    const minutes = Math.floor((time % 3600000) / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
-    const milliseconds = Math.floor(time % 1000);
-    return `${padTime(minutes)}:${padTime(seconds)}.${milliseconds
-      .toString()
-      .padStart(3, "0")}`;
+    return `${days} days, ${padTime(hours)} hours, ${padTime(
+      minutes
+    )} minutes, ${padTime(seconds)} seconds`;
   };
   return (
     <div>

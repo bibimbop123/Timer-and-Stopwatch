@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTimer } from "react-timer-hook";
 import cool_alarm from "../assets/cool_alarm.mp3";
 
@@ -7,10 +7,12 @@ export default function MyTimer() {
   const [selectedSeconds, setSelectedSeconds] = useState(0);
   const [isExpired, setIsExpired] = useState(false);
   const [alarm, setAlarm] = useState(null);
-  const [intervalId, setIntervalId] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [expiryTimestamp, setExpiryTimestamp] = useState(0);
+  const [intervalId, setIntervalId] = useState(null);
+  const intervalIdRef = useRef(null);
+  const duration = selectedSeconds * 1000 + selectedMinutes * 60 * 1000;
 
   const handleMinutesChange = (event) => {
     setSelectedMinutes(parseInt(event.target.value));
@@ -23,25 +25,27 @@ export default function MyTimer() {
   const handleStartClick = () => {
     setIsExpired(false);
     if (isRunning) {
-      clearInterval(intervalId);
-      const expiryTimestamp = Date.now() + timeRemaining;
-      const intervalId = setInterval(() => {
-        const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
-        if (timeRemaining <= 0) {
-          setIsExpired(true);
-          clearInterval(intervalId);
-          if (alarm) {
-            alarm.play();
-            if (window.navigator.vibrate) {
-              window.navigator.vibrate(1000);
+      if (intervalIdRef.current) {
+        clearInterval(intervalId);
+        const expiryTimestamp = Date.now() + timeRemaining;
+        intervalId = setInterval(() => {
+          const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
+          if (timeRemaining <= 0) {
+            setIsExpired(true);
+            clearInterval(intervalId);
+            if (alarm) {
+              alarm.play();
+              if (window.navigator.vibrate) {
+                window.navigator.vibrate(1000);
+              }
             }
           }
-        }
-        setTimeRemaining(timeRemaining);
-      }, 1);
-      setExpiryTimestamp(expiryTimestamp);
-      setIntervalId(intervalId);
+          setTimeRemaining(timeRemaining);
+        }, 1);
+      }
     } else {
+      const duration = selectedSeconds * 1000 + selectedMinutes * 60 * 1000;
+      setDuration(duration);
       startTimer();
     }
     setIsRunning(true);
@@ -49,17 +53,18 @@ export default function MyTimer() {
 
   const handlePauseClick = () => {
     setIsRunning(false);
-    clearInterval(intervalId);
+    clearInterval(intervalIdRef.current);
+    intervalIdRef.current = null;
   };
 
-  const resume = () => {
+  const handleResumeClick = () => {
     setIsRunning(true);
-    const newExpiryTimestamp = Date.now() + timeRemaining;
-    const intervalId = setInterval(() => {
-      const timeRemaining = Math.max(newExpiryTimestamp - Date.now(), 0);
+    const expiryTimestamp = Date.now() + timeRemaining;
+    const newIntervalId = setInterval(() => {
+      const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
       if (timeRemaining <= 0) {
         setIsExpired(true);
-        clearInterval(intervalId);
+        clearInterval(newIntervalId);
         if (alarm) {
           alarm.play();
           if (window.navigator.vibrate) {
@@ -69,22 +74,18 @@ export default function MyTimer() {
       }
       setTimeRemaining(timeRemaining);
     }, 1);
-    setExpiryTimestamp(newExpiryTimestamp);
-    setIntervalId(intervalId);
-  };
-
-  const handleResumeClick = () => {
-    resume();
+    setExpiryTimestamp(expiryTimestamp);
+    intervalIdRef.current = newIntervalId;
   };
 
   const handleRestartClick = () => {
     setIsExpired(false);
+    setDuration(selectedSeconds * 1000 + selectedMinutes * 60 * 1000);
     startTimer();
   };
 
-  const { seconds, minutes, start, pause, restart } = useTimer({
-    expiryTimestamp:
-      Date.now() + selectedMinutes * 60 * 1000 + selectedSeconds * 1000,
+  const { start, pause, restart } = useTimer({
+    expiryTimestamp: expiryTimestamp,
     onExpire: () => {
       setIsExpired(true);
       if (alarm) {
@@ -125,9 +126,12 @@ export default function MyTimer() {
   }, [isExpired, alarm, pauseAlarm]);
 
   useEffect(() => {
-    setIsRunning(isRunning);
-    console.log("isRunning:", isRunning);
-  }, [isRunning]);
+    if (isRunning) {
+      start();
+    } else {
+      pause();
+    }
+  }, [isRunning, start, pause]);
 
   const formatTime = (timeRemaining) => {
     const padTime = (time) => time.toString().padStart(2, "0");
@@ -138,14 +142,16 @@ export default function MyTimer() {
       .toString()
       .padStart(3, "0")}`;
   };
+
   const startTimer = () => {
-    const expiryTimestamp =
-      Date.now() + selectedMinutes * 60 * 1000 + selectedSeconds * 1000;
-    const intervalId = setInterval(() => {
+    setIsRunning(true);
+    clearInterval(intervalIdRef.current);
+    const expiryTimestamp = Date.now() + duration;
+    const newIntervalId = setInterval(() => {
       const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
       if (timeRemaining <= 0) {
         setIsExpired(true);
-        clearInterval(intervalId);
+        clearInterval(newIntervalId);
         if (alarm) {
           alarm.play();
           if (window.navigator.vibrate) {
@@ -155,9 +161,15 @@ export default function MyTimer() {
       }
       setTimeRemaining(timeRemaining);
     }, 1);
-    setIntervalId(intervalId);
-    setTimeRemaining(selectedMinutes * 60 * 1000 + selectedSeconds * 1000);
+    setExpiryTimestamp(expiryTimestamp);
+    intervalIdRef.current = newIntervalId;
   };
+
+  const setDuration = (duration) => {
+    setTimeRemaining(duration);
+    setExpiryTimestamp(Date.now() + duration);
+  };
+
   return (
     <div>
       <div>

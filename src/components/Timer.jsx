@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useTimer } from "react-timer-hook";
+import cool_alarm from "../assets/cool_alarm.mp3";
 
 export default function MyTimer() {
   const [selectedMinutes, setSelectedMinutes] = useState(5);
+  const [selectedSeconds, setSelectedSeconds] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(
     selectedMinutes * 60 * 1000
   );
@@ -12,8 +14,13 @@ export default function MyTimer() {
     setSelectedMinutes(parseInt(event.target.value));
   };
 
+  const handleSecondsChange = (event) => {
+    setSelectedSeconds(parseInt(event.target.value));
+  };
+
   const handleStartClick = () => {
     setTimeRemaining(selectedMinutes * 60 * 1000);
+    setTimeRemaining(selectedSeconds * 1000);
     setIsPaused(false);
   };
 
@@ -44,13 +51,19 @@ export default function MyTimer() {
       const deltaTime = currentTime - lastUpdateTime;
       lastUpdateTime = currentTime;
       setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - deltaTime);
-      rafId = requestAnimationFrame(updateTimer);
+      if (timeRemaining <= 0) {
+        setIsPaused(true);
+        const alarm = new Audio(cool_alarm);
+        alarm.play();
+      } else {
+        rafId = requestAnimationFrame(updateTimer);
+      }
     };
     if (!isPaused) {
       rafId = requestAnimationFrame(updateTimer);
     }
     return () => cancelAnimationFrame(rafId);
-  }, [isPaused]);
+  }, [isPaused, timeRemaining]);
 
   const formatTime = (time) => {
     const padTime = (time) => time.toString().padStart(2, "0");
@@ -71,6 +84,13 @@ export default function MyTimer() {
           id="minutes"
           value={selectedMinutes}
           onChange={handleMinutesChange}
+        />
+        <label htmlFor="seconds">Seconds:</label>
+        <input
+          type="number"
+          id="seconds"
+          value={selectedSeconds}
+          onChange={handleSecondsChange}
         />
       </div>
       <div>

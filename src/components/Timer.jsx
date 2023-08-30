@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTimer } from "react-timer-hook";
 import cool_alarm from "../assets/cool_alarm.mp3";
 
@@ -9,6 +9,8 @@ export default function MyTimer() {
     selectedMinutes * 60 * 1000
   );
   const [isPaused, setIsPaused] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
+  const [alarm, setAlarm] = useState(null);
 
   const handleMinutesChange = (event) => {
     setSelectedMinutes(parseInt(event.target.value));
@@ -19,9 +21,9 @@ export default function MyTimer() {
   };
 
   const handleStartClick = () => {
-    setTimeRemaining(selectedMinutes * 60 * 1000);
-    setTimeRemaining(selectedSeconds * 1000);
+    setTimeRemaining(selectedMinutes * 60 * 1000 + selectedSeconds * 1000);
     setIsPaused(false);
+    setIsExpired(false);
   };
 
   const handlePauseClick = () => {
@@ -33,15 +35,49 @@ export default function MyTimer() {
   };
 
   const handleRestartClick = () => {
-    setTimeRemaining(selectedMinutes * 60 * 1000);
+    setTimeRemaining(selectedMinutes * 60 * 1000 + selectedSeconds * 1000);
     setIsPaused(false);
+    setIsExpired(false);
+    if (alarm) {
+      pauseAlarm();
+    }
   };
 
-  const { seconds, minutes, hours, days } = useTimer({
+  const { minutes, seconds } = useTimer({
     expiryTimestamp: Date.now() + timeRemaining,
-    onExpire: () => console.warn("onExpire called"),
+    onExpire: () => {
+      setIsExpired(true);
+      if (alarm) {
+        alarm.play();
+        if (window.navigator.vibrate) {
+          window.navigator.vibrate(1000);
+        }
+      }
+    },
     autoStart: false,
   });
+  useEffect(() => {
+    setAlarm(new Audio(cool_alarm));
+    return pauseAlarm;
+  }, []);
+
+  const pauseAlarm = useCallback(() => {
+    if (alarm) {
+      alarm.pause();
+      alarm.currentTime = 0;
+    }
+  }, [alarm]);
+
+  useEffect(() => {
+    if (isExpired) {
+      alarm.play();
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(1000);
+      }
+    } else {
+      pauseAlarm();
+    }
+  }, [isExpired, alarm, pauseAlarm]);
 
   useEffect(() => {
     let rafId;
@@ -53,8 +89,6 @@ export default function MyTimer() {
       setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - deltaTime);
       if (timeRemaining <= 0) {
         setIsPaused(true);
-        const alarm = new Audio(cool_alarm);
-        alarm.play();
       } else {
         rafId = requestAnimationFrame(updateTimer);
       }
@@ -64,16 +98,14 @@ export default function MyTimer() {
     }
     return () => cancelAnimationFrame(rafId);
   }, [isPaused, timeRemaining]);
-
   const formatTime = (time) => {
     const padTime = (time) => time.toString().padStart(2, "0");
-    const days = Math.floor(time / 86400000);
-    const hours = Math.floor((time % 86400000) / 3600000);
-    const minutes = Math.floor((time % 3600000) / 60000);
+    const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
-    return `${days} days, ${padTime(hours)} hours, ${padTime(
-      minutes
-    )} minutes, ${padTime(seconds)} seconds`;
+    const milliseconds = Math.floor(time % 1000);
+    return `${padTime(minutes)}:${padTime(seconds)}.${milliseconds
+      .toString()
+      .padStart(3, "0")}`;
   };
   return (
     <div>

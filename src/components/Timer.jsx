@@ -5,12 +5,10 @@ import cool_alarm from "../assets/cool_alarm.mp3";
 export default function MyTimer() {
   const [selectedMinutes, setSelectedMinutes] = useState(5);
   const [selectedSeconds, setSelectedSeconds] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(
-    selectedMinutes * 60 * 1000
-  );
-  const [isPaused, setIsPaused] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [alarm, setAlarm] = useState(null);
+  const [intervalId, setIntervalId] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(0);
 
   const handleMinutesChange = (event) => {
     setSelectedMinutes(parseInt(event.target.value));
@@ -21,30 +19,35 @@ export default function MyTimer() {
   };
 
   const handleStartClick = () => {
-    setTimeRemaining(selectedMinutes * 60 * 1000 + selectedSeconds * 1000);
-    setIsPaused(false);
     setIsExpired(false);
+    startTimer();
   };
 
   const handlePauseClick = () => {
-    setIsPaused(true);
+    pause();
   };
 
   const handleResumeClick = () => {
-    setIsPaused(false);
+    resume();
   };
 
   const handleRestartClick = () => {
-    setTimeRemaining(selectedMinutes * 60 * 1000 + selectedSeconds * 1000);
-    setIsPaused(false);
     setIsExpired(false);
-    if (alarm) {
-      pauseAlarm();
-    }
+    restart(Date.now() + selectedMinutes * 60 * 1000 + selectedSeconds * 1000);
   };
 
-  const { minutes, seconds } = useTimer({
-    expiryTimestamp: Date.now() + timeRemaining,
+  const {
+    seconds,
+    minutes,
+    isRunning,
+    start,
+    pause,
+    resume,
+    restart,
+    expiryTimestamp,
+  } = useTimer({
+    expiryTimestamp:
+      Date.now() + selectedMinutes * 60 * 1000 + selectedSeconds * 1000,
     onExpire: () => {
       setIsExpired(true);
       if (alarm) {
@@ -56,6 +59,7 @@ export default function MyTimer() {
     },
     autoStart: false,
   });
+
   useEffect(() => {
     setAlarm(new Audio(cool_alarm));
     return pauseAlarm;
@@ -68,6 +72,10 @@ export default function MyTimer() {
     }
   }, [alarm]);
 
+  const handleAlarmLoaded = (event) => {
+    setAlarm(event.target);
+  };
+
   useEffect(() => {
     if (isExpired) {
       alarm.play();
@@ -79,33 +87,33 @@ export default function MyTimer() {
     }
   }, [isExpired, alarm, pauseAlarm]);
 
-  useEffect(() => {
-    let rafId;
-    let lastUpdateTime = Date.now();
-    const updateTimer = () => {
-      const currentTime = Date.now();
-      const deltaTime = currentTime - lastUpdateTime;
-      lastUpdateTime = currentTime;
-      setTimeRemaining((prevTimeRemaining) => prevTimeRemaining - deltaTime);
-      if (timeRemaining <= 0) {
-        setIsPaused(true);
-      } else {
-        rafId = requestAnimationFrame(updateTimer);
-      }
-    };
-    if (!isPaused) {
-      rafId = requestAnimationFrame(updateTimer);
-    }
-    return () => cancelAnimationFrame(rafId);
-  }, [isPaused, timeRemaining]);
-  const formatTime = (time) => {
+  const formatTime = (timeRemaining) => {
     const padTime = (time) => time.toString().padStart(2, "0");
-    const minutes = Math.floor(time / 60000);
-    const seconds = Math.floor((time % 60000) / 1000);
-    const milliseconds = Math.floor(time % 1000);
+    const minutes = Math.floor(timeRemaining / 60000);
+    const seconds = Math.floor((timeRemaining % 60000) / 1000);
+    const milliseconds = Math.floor(timeRemaining % 1000);
     return `${padTime(minutes)}:${padTime(seconds)}.${milliseconds
       .toString()
       .padStart(3, "0")}`;
+  };
+  const startTimer = () => {
+    const expiryTimestamp =
+      Date.now() + selectedMinutes * 60 * 1000 + selectedSeconds * 1000;
+    const intervalId = setInterval(() => {
+      const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
+      if (timeRemaining <= 0) {
+        setIsExpired(true);
+        clearInterval(intervalId);
+        if (alarm) {
+          alarm.play();
+          if (window.navigator.vibrate) {
+            window.navigator.vibrate(1000);
+          }
+        }
+      }
+      setTimeRemaining(timeRemaining);
+    }, 1);
+    setIntervalId(intervalId);
   };
   return (
     <div>
@@ -134,6 +142,7 @@ export default function MyTimer() {
       <div>
         <p>Time Remaining: {formatTime(timeRemaining)}</p>
       </div>
+      <audio src={cool_alarm} onLoadedData={handleAlarmLoaded} />
     </div>
   );
 }

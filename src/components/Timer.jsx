@@ -101,12 +101,6 @@ export default function MyTimer() {
     }
   }, [isExpired, alarm]);
 
-  useEffect(() => {
-    return () => {
-      cancelAnimationFrame(intervalIdRef.current);
-    };
-  }, []);
-
   const formatTime = (timeRemaining) => {
     const padTime = (time) => time.toString().padStart(2, "0");
     const days = Math.floor(timeRemaining / 86400000);
@@ -121,29 +115,27 @@ export default function MyTimer() {
       .padStart(3, "0")} milliseconds`;
   };
   const startTimer = (expiryTimestamp) => {
-    let animationFrameId = null;
-    const updateTimer = () => {
+    clearInterval(intervalIdRef.current);
+    const newIntervalId = setInterval(() => {
       const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
       if (timeRemaining <= 0) {
         setIsExpired(true);
+        clearInterval(newIntervalId);
         if (alarm) {
           alarm.play();
           if (window.navigator.vibrate) {
             window.navigator.vibrate(1000);
           }
         }
-      } else {
-        setTimeRemaining(timeRemaining);
-        animationFrameId = requestAnimationFrame(updateTimer);
       }
-    };
-    animationFrameId = requestAnimationFrame(updateTimer);
-    intervalIdRef.current = animationFrameId;
+      setTimeRemaining(timeRemaining);
+    }, 1);
+    intervalIdRef.current = newIntervalId;
     start({ expiryTimestamp });
   };
 
-  const handleAlarmLoaded = () => {
-    const audioElement = new Audio(cool_alarm);
+  const handleAlarmLoaded = (event = null) => {
+    const audioElement = event ? event.target : new Audio(cool_alarm);
     setAlarm(audioElement);
     setIsLoaded(true);
   };

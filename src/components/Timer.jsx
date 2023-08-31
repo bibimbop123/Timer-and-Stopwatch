@@ -10,9 +10,9 @@ export default function MyTimer() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [expiryTimestamp, setExpiryTimestamp] = useState(0);
-  const [intervalId, setIntervalId] = useState(null);
   const intervalIdRef = useRef(null);
   const duration = selectedSeconds * 1000 + selectedMinutes * 60 * 1000;
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const handleMinutesChange = (event) => {
     setSelectedMinutes(parseInt(event.target.value));
@@ -26,33 +26,19 @@ export default function MyTimer() {
     setIsExpired(false);
     if (isRunning) {
       if (intervalIdRef.current) {
-        clearInterval(intervalId);
-        const expiryTimestamp = Date.now() + timeRemaining;
-        intervalId = setInterval(() => {
-          const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
-          if (timeRemaining <= 0) {
-            setIsExpired(true);
-            clearInterval(intervalId);
-            if (alarm) {
-              alarm.play();
-              if (window.navigator.vibrate) {
-                window.navigator.vibrate(1000);
-              }
-            }
-          }
-          setTimeRemaining(timeRemaining);
-        }, 1);
+        clearInterval(intervalIdRef.current);
       }
     } else {
-      const duration = selectedSeconds * 1000 + selectedMinutes * 60 * 1000;
-      setDuration(duration);
-      startTimer();
+      const expiryTimestamp = Date.now() + duration;
+      setExpiryTimestamp(expiryTimestamp);
+      setIsRunning(true);
+      startTimer(expiryTimestamp);
     }
-    setIsRunning(true);
   };
 
   const handlePauseClick = () => {
     setIsRunning(false);
+    pause();
     clearInterval(intervalIdRef.current);
     intervalIdRef.current = null;
   };
@@ -60,34 +46,22 @@ export default function MyTimer() {
   const handleResumeClick = () => {
     setIsRunning(true);
     const expiryTimestamp = Date.now() + timeRemaining;
-    const newIntervalId = setInterval(() => {
-      const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
-      if (timeRemaining <= 0) {
-        setIsExpired(true);
-        clearInterval(newIntervalId);
-        if (alarm) {
-          alarm.play();
-          if (window.navigator.vibrate) {
-            window.navigator.vibrate(1000);
-          }
-        }
-      }
-      setTimeRemaining(timeRemaining);
-    }, 1);
-    setExpiryTimestamp(expiryTimestamp);
-    intervalIdRef.current = newIntervalId;
+    startTimer(expiryTimestamp);
   };
 
   const handleRestartClick = () => {
     setIsExpired(false);
-    setDuration(selectedSeconds * 1000 + selectedMinutes * 60 * 1000);
-    startTimer();
+    const expiryTimestamp = Date.now() + duration;
+    setExpiryTimestamp(expiryTimestamp);
+    setIsRunning(true);
+    startTimer(expiryTimestamp);
   };
 
-  const { start, pause, restart } = useTimer({
+  const { start, pause, resume, restart } = useTimer({
     expiryTimestamp: expiryTimestamp,
     onExpire: () => {
       setIsExpired(true);
+
       if (alarm) {
         alarm.play();
         if (window.navigator.vibrate) {
@@ -98,11 +72,6 @@ export default function MyTimer() {
     autoStart: false,
   });
 
-  useEffect(() => {
-    setAlarm(new Audio(cool_alarm));
-    return pauseAlarm;
-  }, []);
-
   const pauseAlarm = useCallback(() => {
     if (alarm) {
       alarm.pause();
@@ -110,28 +79,27 @@ export default function MyTimer() {
     }
   }, [alarm]);
 
-  const handleAlarmLoaded = (event) => {
-    setAlarm(event.target);
-  };
+  useEffect(() => {
+    setAlarm(new Audio(cool_alarm));
+    return pauseAlarm;
+  }, [pauseAlarm]);
 
   useEffect(() => {
     if (isExpired) {
-      alarm.play();
-      if (window.navigator.vibrate) {
-        window.navigator.vibrate(1000);
+      if (alarm && !alarm.paused && alarm.currentTime > 0) {
+        alarm.play();
+        handleAlarmLoaded();
+        if (window.navigator.vibrate) {
+          window.navigator.vibrate(1000);
+        }
       }
     } else {
-      pauseAlarm();
+      if (alarm) {
+        alarm.pause();
+        alarm.currentTime = 0;
+      }
     }
-  }, [isExpired, alarm, pauseAlarm]);
-
-  useEffect(() => {
-    if (isRunning) {
-      start();
-    } else {
-      pause();
-    }
-  }, [isRunning, start, pause]);
+  }, [isExpired, alarm]);
 
   const formatTime = (timeRemaining) => {
     const padTime = (time) => time.toString().padStart(2, "0");
@@ -143,10 +111,8 @@ export default function MyTimer() {
       .padStart(3, "0")}`;
   };
 
-  const startTimer = () => {
-    setIsRunning(true);
+  const startTimer = (expiryTimestamp) => {
     clearInterval(intervalIdRef.current);
-    const expiryTimestamp = Date.now() + duration;
     const newIntervalId = setInterval(() => {
       const timeRemaining = Math.max(expiryTimestamp - Date.now(), 0);
       if (timeRemaining <= 0) {
@@ -161,14 +127,25 @@ export default function MyTimer() {
       }
       setTimeRemaining(timeRemaining);
     }, 1);
-    setExpiryTimestamp(expiryTimestamp);
     intervalIdRef.current = newIntervalId;
+    start({ expiryTimestamp });
   };
 
-  const setDuration = (duration) => {
-    setTimeRemaining(duration);
-    setExpiryTimestamp(Date.now() + duration);
+  const handleAlarmLoaded = (event = null) => {
+    const audioElement = event ? event.target : new Audio(cool_alarm);
+    setAlarm(audioElement);
+    setIsLoaded(true);
   };
+
+  useEffect(() => {
+    if (!isLoaded) {
+      const audioElement = new Audio(cool_alarm);
+      audioElement.addEventListener("loadeddata", handleAlarmLoaded);
+      return () => {
+        audioElement.removeEventListener("loadeddata", handleAlarmLoaded);
+      };
+    }
+  }, [isLoaded]);
 
   return (
     <div>
@@ -192,14 +169,18 @@ export default function MyTimer() {
         <button onClick={handleStartClick} disabled={isRunning}>
           Start
         </button>
-        <button onClick={handlePauseClick}>Pause</button>
-        <button onClick={handleResumeClick}>Resume</button>
+        <button onClick={handlePauseClick} disabled={!isRunning}>
+          Pause
+        </button>
+        <button onClick={handleResumeClick} disabled={isRunning}>
+          Resume
+        </button>
         <button onClick={handleRestartClick}>Restart</button>
       </div>
       <div>
         <p>Time Remaining: {formatTime(timeRemaining)}</p>
       </div>
-      <audio src={cool_alarm} onLoadedData={handleAlarmLoaded} />
+      <audio src={cool_alarm} />
     </div>
   );
 }

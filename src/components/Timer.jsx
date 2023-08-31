@@ -19,6 +19,12 @@ export default function MyTimer() {
     selectedHours * 60 * 60 * 1000 +
     selectedDays * 24 * 60 * 60 * 1000;
   const [isLoaded, setIsLoaded] = useState(false);
+  const [days, hours, minutes, seconds] = [
+    Math.floor(timeRemaining / 86400000),
+    Math.floor((timeRemaining % 86400000) / 3600000),
+    Math.floor(((timeRemaining % 86400000) % 3600000) / 60000),
+    Math.floor((((timeRemaining % 86400000) % 3600000) % 60000) / 1000),
+  ];
 
   const handleDaysChange = (event) => {
     setSelectedDays(parseInt(event.target.value));
@@ -116,17 +122,18 @@ export default function MyTimer() {
 
   const formatTime = (timeRemaining) => {
     const padTime = (time) => time.toString().padStart(2, "0");
-    const days = Math.floor(timeRemaining / 86400000);
-    const hours = Math.floor(timeRemaining / 3600000);
-    const minutes = Math.floor((timeRemaining % 3600000) / 60000);
-    const seconds = Math.floor((timeRemaining % 60000) / 1000);
+    const formattedDays = padTime(days);
+    const formattedHours = padTime(hours);
+    const formattedMinutes = padTime(minutes);
+    const formattedSeconds = padTime(seconds);
     const milliseconds = Math.floor(timeRemaining % 1000);
-    return `${padTime(days)} days, ${padTime(hours)} hours, ${padTime(
-      minutes
-    )} minutes, ${padTime(seconds)} seconds, ${milliseconds
-      .toString()
-      .padStart(3, "0")} milliseconds`;
+    return `${padTime(formattedDays)} days, ${padTime(
+      formattedHours
+    )} hours, ${padTime(formattedMinutes)} minutes, ${padTime(
+      formattedSeconds
+    )} seconds, ${milliseconds.toString().padStart(3, "0")} milliseconds`;
   };
+
   const startTimer = (expiryTimestamp) => {
     clearInterval(intervalIdRef.current);
     const newIntervalId = setInterval(() => {

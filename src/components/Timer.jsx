@@ -142,8 +142,8 @@ export default function MyTimer() {
     start({ expiryTimestamp });
   };
 
-  const handleAlarmLoaded = (event = null) => {
-    const audioElement = event ? event.target : new Audio(cool_alarm);
+  const handleAlarmLoaded = () => {
+    const audioElement = new Audio(cool_alarm);
     setAlarm(audioElement);
     setIsLoaded(true);
   };

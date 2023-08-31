@@ -1,5 +1,6 @@
 import "./App.css";
 import MyTimer from "./components/Timer";
+import cool_alarm from "./assets/cool_alarm.mp3";
 
 function App() {
   return (
@@ -14,6 +15,10 @@ function App() {
         <MyTimer />
         <p className="title">Stopwatch</p>
       </div>
+      <audio id="alarm" src={cool_alarm} />
+      <footer className="App-footer">
+        <p>Created by:Brian Kim &copy; 2021</p>
+      </footer>
     </div>
   );
 }

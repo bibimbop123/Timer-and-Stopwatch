@@ -3,6 +3,8 @@ import { useTimer } from "react-timer-hook";
 import cool_alarm from "../assets/cool_alarm.mp3";
 
 export default function MyTimer() {
+  const [selectedDays, setSelectedDays] = useState(0);
+  const [selectedHours, setSelectedHours] = useState(0); // [1
   const [selectedMinutes, setSelectedMinutes] = useState(5);
   const [selectedSeconds, setSelectedSeconds] = useState(0);
   const [isExpired, setIsExpired] = useState(false);
@@ -11,8 +13,19 @@ export default function MyTimer() {
   const [isRunning, setIsRunning] = useState(false);
   const [expiryTimestamp, setExpiryTimestamp] = useState(0);
   const intervalIdRef = useRef(null);
-  const duration = selectedSeconds * 1000 + selectedMinutes * 60 * 1000;
+  const duration =
+    selectedSeconds * 1000 +
+    selectedMinutes * 60 * 1000 +
+    selectedHours * 60 * 60 * 1000 +
+    selectedDays * 24 * 60 * 60 * 1000;
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const handleDaysChange = (event) => {
+    setSelectedDays(parseInt(event.target.value));
+  };
+  const handleHoursChange = (event) => {
+    setSelectedHours(parseInt(event.target.value));
+  };
 
   const handleMinutesChange = (event) => {
     setSelectedMinutes(parseInt(event.target.value));
@@ -153,6 +166,20 @@ export default function MyTimer() {
   return (
     <div>
       <div>
+        <label htmlFor="days">Days:</label>
+        <input
+          type="number"
+          id="days"
+          value={selectedDays}
+          onChange={handleDaysChange}
+        />
+        <label htmlFor="hours">Hours:</label>
+        <input
+          type="number"
+          id="hours"
+          value={selectedHours}
+          onChange={handleHoursChange}
+        />
         <label htmlFor="minutes">Minutes:</label>
         <input
           type="number"

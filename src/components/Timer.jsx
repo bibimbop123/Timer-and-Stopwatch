@@ -57,7 +57,7 @@ export default function MyTimer() {
     startTimer(expiryTimestamp);
   };
 
-  const { start, pause, resume, restart } = useTimer({
+  const { start, pause } = useTimer({
     expiryTimestamp: expiryTimestamp,
     onExpire: () => {
       setIsExpired(true);
@@ -103,14 +103,17 @@ export default function MyTimer() {
 
   const formatTime = (timeRemaining) => {
     const padTime = (time) => time.toString().padStart(2, "0");
-    const minutes = Math.floor(timeRemaining / 60000);
+    const days = Math.floor(timeRemaining / 86400000);
+    const hours = Math.floor(timeRemaining / 3600000);
+    const minutes = Math.floor((timeRemaining % 3600000) / 60000);
     const seconds = Math.floor((timeRemaining % 60000) / 1000);
     const milliseconds = Math.floor(timeRemaining % 1000);
-    return `${padTime(minutes)}:${padTime(seconds)}.${milliseconds
+    return `${padTime(days)} days, ${padTime(hours)} hours, ${padTime(
+      minutes
+    )} minutes, ${padTime(seconds)} seconds, ${milliseconds
       .toString()
-      .padStart(3, "0")}`;
+      .padStart(3, "0")} milliseconds`;
   };
-
   const startTimer = (expiryTimestamp) => {
     clearInterval(intervalIdRef.current);
     const newIntervalId = setInterval(() => {

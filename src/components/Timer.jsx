@@ -11,7 +11,7 @@ export default function MyTimer() {
   const [alarm, setAlarm] = useState(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const [expiryTimestamp, setExpiryTimestamp] = useState(0);
+  const [expiryTimestamp, setExpiryTimestamp] = useState(null);
   const intervalIdRef = useRef(null);
   const duration =
     selectedSeconds * 1000 +

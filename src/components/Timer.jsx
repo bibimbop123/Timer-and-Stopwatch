@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTimer } from "react-timer-hook";
 import cool_alarm from "../assets/cool_alarm.mp3";
 import memory from "../assets/memory.jpg";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function MyTimer() {
   const [selectedDays, setSelectedDays] = useState(0);
-  const [selectedHours, setSelectedHours] = useState(0); // [1
+  const [selectedHours, setSelectedHours] = useState(0);
   const [selectedMinutes, setSelectedMinutes] = useState(5);
   const [selectedSeconds, setSelectedSeconds] = useState(0);
   const [isExpired, setIsExpired] = useState(false);
@@ -19,13 +19,14 @@ export default function MyTimer() {
     selectedMinutes * 60 * 1000 +
     selectedHours * 60 * 60 * 1000 +
     selectedDays * 24 * 60 * 60 * 1000;
-  const [isLoaded, setIsLoaded] = useState(false);
   const [days, hours, minutes, seconds] = [
     Math.floor(timeRemaining / 86400000),
     Math.floor((timeRemaining % 86400000) / 3600000),
     Math.floor(((timeRemaining % 86400000) % 3600000) / 60000),
     Math.floor((((timeRemaining % 86400000) % 3600000) % 60000) / 1000),
   ];
+  const [isPaused, setIsPaused] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const handleDaysChange = (event) => {
     setSelectedDays(parseInt(event.target.value));
@@ -48,15 +49,19 @@ export default function MyTimer() {
       if (intervalIdRef.current) {
         clearInterval(intervalIdRef.current);
       }
+      setIsPaused(true);
+      setIsRunning(false);
     } else {
       const expiryTimestamp = Date.now() + duration;
       setExpiryTimestamp(expiryTimestamp);
       setIsRunning(true);
+      setIsPaused(false);
       startTimer(expiryTimestamp);
     }
   };
 
   const handlePauseClick = () => {
+    setIsPaused(true);
     setIsRunning(false);
     pause();
     clearInterval(intervalIdRef.current);
@@ -64,6 +69,7 @@ export default function MyTimer() {
   };
 
   const handleResumeClick = () => {
+    setIsPaused(false);
     setIsRunning(true);
     const expiryTimestamp = Date.now() + timeRemaining;
     startTimer(expiryTimestamp);
@@ -74,22 +80,28 @@ export default function MyTimer() {
     const expiryTimestamp = Date.now() + duration;
     setExpiryTimestamp(expiryTimestamp);
     setIsRunning(true);
+    setIsPaused(false);
     startTimer(expiryTimestamp);
   };
-
-  const { start, pause } = useTimer({
-    expiryTimestamp: expiryTimestamp,
-    onExpire: () => {
-      setIsExpired(true);
-
-      if (alarm) {
-        alarm.play();
-        if (window.navigator.vibrate) {
-          window.navigator.vibrate(1000);
-        }
+  const handleTimerComplete = () => {
+    setIsRunning(false);
+    setIsPaused(false);
+    setIsCompleted(true);
+    if (alarm) {
+      alarm.play();
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(1000);
       }
-    },
+    }
+    //at the end of the timer, alert the user
+    alert("Time's up!");
+  };
+
+  const { pause } = useTimer({
+    expiryTimestamp: expiryTimestamp,
+    onExpire: handleTimerComplete,
     autoStart: false,
+    interval: 1000, // set the interval to 1 second
   });
 
   const pauseAlarm = useCallback(() => {
@@ -134,7 +146,6 @@ export default function MyTimer() {
       formattedSeconds
     )} seconds, ${milliseconds.toString().padStart(3, "0")} milliseconds`;
   };
-
   const startTimer = (expiryTimestamp) => {
     clearInterval(intervalIdRef.current);
     const newIntervalId = setInterval(() => {
@@ -142,34 +153,27 @@ export default function MyTimer() {
       if (timeRemaining <= 0) {
         setIsExpired(true);
         clearInterval(newIntervalId);
-        if (alarm) {
-          alarm.play();
-          if (window.navigator.vibrate) {
-            window.navigator.vibrate(1000);
-          }
-        }
+        handleTimerComplete();
       }
       setTimeRemaining(timeRemaining);
     }, 1);
     intervalIdRef.current = newIntervalId;
-    start({ expiryTimestamp });
   };
 
   const handleAlarmLoaded = (event = null) => {
     const audioElement = event ? event.target : new Audio(cool_alarm);
     setAlarm(audioElement);
-    setIsLoaded(true);
+    audioElement.play().then(() => {
+      audioElement.pause();
+      audioElement.currentTime = 0;
+      audioElement.muted = false;
+    });
   };
 
-  useEffect(() => {
-    if (!isLoaded) {
-      const audioElement = new Audio(cool_alarm);
-      audioElement.addEventListener("loadeddata", handleAlarmLoaded);
-      return () => {
-        audioElement.removeEventListener("loadeddata", handleAlarmLoaded);
-      };
-    }
-  }, [isLoaded]);
+  const isSafari = () => {
+    const ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf("safari") !== -1 && ua.indexOf("chrome") === -1;
+  };
 
   return (
     <div className="timer-component">
@@ -247,7 +251,7 @@ export default function MyTimer() {
         <button
           className="button"
           onClick={handleResumeClick}
-          disabled={isRunning}
+          disabled={isRunning || !isPaused}
         >
           Resume
         </button>
@@ -255,6 +259,7 @@ export default function MyTimer() {
           Restart
         </button>
       </div>
+      <br />
       <br />
       <br />
       <div className="Time-remaining-container">

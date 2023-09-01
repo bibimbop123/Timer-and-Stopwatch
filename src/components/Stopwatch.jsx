@@ -6,6 +6,7 @@ export default function MyStopwatch() {
     useStopwatch({ autoStart: false });
 
   const [milliseconds, setMilliseconds] = useState(0);
+  const [pausedTime, setPausedTime] = useState(0);
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -25,6 +26,23 @@ export default function MyStopwatch() {
   const handleResetClick = () => {
     reset();
     setMilliseconds(0); // Reset milliseconds to 0
+    setPausedTime(0); // Reset paused time to 0
+  };
+
+  const handleStartClick = () => {
+    if (pausedTime > 0) {
+      const now = new Date().getTime();
+      const timeElapsed = now - pausedTime;
+      start(new Date(timeElapsed));
+      setPausedTime(0);
+    } else {
+      start();
+    }
+  };
+
+  const handlePauseClick = () => {
+    pause();
+    setPausedTime(new Date().getTime());
   };
 
   const formatTime = (timeRemaining) => {
@@ -60,8 +78,8 @@ export default function MyStopwatch() {
         </p>
       )}
       <p>{isRunning ? "Running" : "Not running"}</p>
-      <button onClick={start}>Start</button>
-      <button onClick={pause}>Pause</button>
+      <button onClick={handleStartClick}>Start</button>
+      <button onClick={handlePauseClick}>Pause</button>
       <button onClick={handleResetClick}>Reset</button>
     </div>
   );

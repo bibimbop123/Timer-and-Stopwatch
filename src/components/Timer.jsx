@@ -257,7 +257,6 @@ export default function MyTimer() {
       </div>
       <br />
       <br />
-      <br />
       <div className="Time-remaining-container">
         <p className="Time-remaining">
           Time Remaining: {formatTime(timeRemaining)}

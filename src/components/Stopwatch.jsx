@@ -12,7 +12,7 @@ export default function MyStopwatch() {
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setMilliseconds((prevMillis) => prevMillis + 33); // Increment milliseconds by 1
+        setMilliseconds((prevMillis) => prevMillis + 76); // Increment milliseconds by 1
       }, 10);
     } else {
       clearInterval(intervalRef.current);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useTimer } from "react-timer-hook";
 import cool_alarm from "../assets/cool_alarm.mp3";
+import memory from "../assets/memory.jpg";
 
 export default function MyTimer() {
   const [selectedDays, setSelectedDays] = useState(0);
@@ -173,44 +174,60 @@ export default function MyTimer() {
   return (
     <div className="timer-component">
       <div>
-        <label className="label" htmlFor="days">
-          Days:
-        </label>
-        <input
-          type="number"
-          id="days"
-          value={selectedDays}
-          onChange={handleDaysChange}
-        />
-        <label className="label" htmlFor="hours">
-          Hours:
-        </label>
-        <input
-          type="number"
-          id="hours"
-          value={selectedHours}
-          onChange={handleHoursChange}
-        />
-        <label className="label" htmlFor="minutes">
-          Minutes:
-        </label>
-        <input
-          type="number"
-          id="minutes"
-          value={selectedMinutes}
-          onChange={handleMinutesChange}
-        />
-        <label className="label" htmlFor="seconds">
-          Seconds:
-        </label>
-        <input
-          type="number"
-          id="seconds"
-          value={selectedSeconds}
-          onChange={handleSecondsChange}
-        />
+        <div className="label-container">
+          <label className="label" htmlFor="days">
+            Days:
+          </label>
+          <input
+            className="input"
+            type="number"
+            id="days"
+            value={selectedDays}
+            onChange={handleDaysChange}
+          />
+        </div>
+        <div className="label-container">
+          <label className="label" htmlFor="hours">
+            Hours:
+          </label>
+          <input
+            className="input"
+            type="number"
+            id="hours"
+            value={selectedHours}
+            onChange={handleHoursChange}
+          />
+        </div>
+        <div className="label-container">
+          <label className="label" htmlFor="minutes">
+            Minutes:
+          </label>
+          <input
+            className="input"
+            type="number"
+            id="minutes"
+            value={selectedMinutes}
+            onChange={handleMinutesChange}
+          />
+        </div>
+        <div className="label-container">
+          <label className="label" htmlFor="seconds">
+            Seconds:
+          </label>
+          <input
+            className="input"
+            type="number"
+            id="seconds"
+            value={selectedSeconds}
+            onChange={handleSecondsChange}
+          />
+        </div>
       </div>
       <br />
+      <br />
+      <br />
+
+      <img src={memory} alt="memory" />
       <br />
       <div>
         <button

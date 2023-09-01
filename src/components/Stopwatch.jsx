@@ -30,6 +30,10 @@ export default function MyStopwatch() {
   };
 
   const handleStartClick = () => {
+    if (isRunning) {
+      return; // Do nothing if stopwatch is already running
+    }
+
     if (pausedTime > 0) {
       const now = new Date().getTime();
       const timeElapsed = now - pausedTime;

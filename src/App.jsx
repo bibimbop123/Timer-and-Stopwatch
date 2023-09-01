@@ -14,6 +14,8 @@ function App() {
         {/* <Timer /> */}
 
         <MyTimer />
+        <br />
+        <br />
         <p className="title">Stopwatch</p>
         {/* <Stopwatch /> */}
         <MyStopwatch />

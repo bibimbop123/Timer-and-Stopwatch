@@ -1,47 +1,88 @@
 /* General styles */
 body {
-  font-family: Arial, sans-serif;
+  font-family: Marker Felt, fantasy;
   margin: 0;
   padding: 0;
+  background-color: #F49FBC;
 }
 
 /* Layout and structure */
 .App {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   text-align: center;
 }
 
 /* Header and footer */
-.App-header{
-  background-color: #222;
-  padding: 20px;
+.App-header {
+  background-color: #169873;
   color: white;
+  padding: 20px;
   font-size: 2rem;
+  width:100%;
 }
-
 .App-footer {
-  background-color: #222;
+  background-color: #169873;
   color: white;
   padding: 20px;
+  width:100%;
 }
 
 /* Content sections */
-.app-body,
+.App-body {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  font-size: 2rem;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+}
+
 .timer-display,
 .button {
-  background-color: #222;
+  background-color: #169873;
   color: white;
-  padding: 20px;
   font-size: 2rem;
   height: 150px;
+  padding: 20px;
+}
+
+/* Space between inputs */
+.label-container {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  font-size: 1rem;
+  justify-content: space-between;
+  margin: 5px;
+  padding: 5px;
+  text-align: center;
+  width: 100%;
 }
 
 /* Title */
+/* Title */
 .title {
-  background-color: #222;
+  align-items: center;
+  background-color: #805D93;
   color: white;
-  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
   font-size: 2rem;
-  height: 50px;
+  height: auto;
+  justify-content: center;
+  margin: 10px;
+  padding: 20px;
+  text-align: center;
+  width: 100%;
 }
 
 /* Links */
@@ -56,43 +97,224 @@ body {
 
 /* Timer component */
 .timer-component {
-  background-color: #222;
-  color: white;
-  padding: 20px;
-  font-size: 1rem;
-  height: 200px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  font-size: 2rem;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
 }
 
-/* Time remaining */
+/* Time-remaining in timer component and stop watch is centered in the webpage*/
 .Time-remaining {
-  background-color: #222;
+  align-items: center;
+  background-color: #9EBD6E;
   color: white;
+  display: flex;
+  flex-grow: 1;
   font-size: 2rem;
+  height: 150px;
+  justify-content: center;
+  margin: 10px;
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+
 }
 
 /* Label */
 .label {
-  background-color: #222;
+  align-items: center;
+  background-color: #169873;
   color: white;
-  padding: 20px;
-  font-size: 2rem;
-  height: 150px;
+  display: flex;
+  flex-grow: 1;
+  font-size: 10px;
+  height: auto;
+  justify-content: center;
+  margin: 10px;
+  padding: 5px;
+  text-align: center;
+  width: 100%;
 }
 
 /* Buttons */
 .button {
-  background-color: red;
-  color: white;
-  padding: 10px 10px;
-  font-size: 1rem;
+  background-color: #169873;
   border: none;
   border-radius: 5px;
+  color: white;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 2rem;
   height: fit-content;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
   width: fit-content;
 }
 
 .button:hover {
-  background-color: #00cccc;
+  background-color: #805D93;
+}
+
+/* Input */
+.input {
+  font-size: 2rem;
+  height: 50px;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 150px;
+}
+/*border indent around img */
+img {
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 700px;
+  height: 700px;
+  border: 10px solid #169873;
+  border-radius: 10px;
+  
+}
+
+/* Mobile and tablet view */
+@media only screen and (max-width: 768px) {
+  /* Content sections */
+  .app-body {
+    font-size: 1.5rem;
+    padding: 10px;
+  }
+  .timer-display {
+    font-size: 2rem;
+    height: 100px;
+    padding: 10px;
+  }
+  .button {
+    font-size: 1.5rem;
+    height: 50px;
+    padding: 5px 10px;
+    width: 120px;
+  }
+  .label-container {
+    font-size: medium;
+    height: auto;
+    padding: 10px;
+  }
+
+  /* Title */
+  .title {
+    font-size: 1.5rem;
+    height: auto;
+    padding: 20px;
+    width:100%
+  }
+
+  /* Label */
+  .label {
+    font-size: 1.5rem;
+    height: auto;
+    padding: 20px;
+  }
+
+  /* Time remaining */
+  .Time-remaining {
+    font-size: 1.5rem;
+    height: 100px;
+    padding: 10px;
+    width: 100%;
+  }
+
+  /* Input */
+  .input {
+    font-size: 1.5rem;
+    height: 30px;
+    margin: 10px;
+    padding: 5px;
+    text-align: center;
+    width: 80px;
+  }
+}
+img {
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 300px;
+  height: 300px;
+  border: 10px solid #169873;
+  border-radius: 10px;
+  
+}
+/* Desktop view */
+@media only screen and (min-width: 769px) {
+  /* Content sections */
+  .app-body {
+    font-size: 2rem;
+    padding: 10px;
+  }
+  .timer-display {
+    font-size: 2rem;
+    height: 150px;
+    padding: 20px;
+  }
+  .button {
+    font-size: 2rem;
+    height: fit-content;
+    padding: 10px 20px;
+    width: fit-content;
+  }
+  .label-container {
+    font-size: 2rem;
+    height: auto;
+    padding: 10px;
+  }
+
+  /* Title */
+  .title {
+    font-size: 2rem;
+    height: auto;
+    padding: 20px;
+    width:100%
+    
+  }
+
+  /* Label */
+  .label {
+    font-size: 2rem;
+    height: auto;
+    padding: 20px;
+    float: left;
+  }
+
+  /* Time remaining */
+  .Time-remaining {
+    font-size: 2rem;
+    height: 150px;
+    padding: 20px;
+    width: 100%;
+  }
+
+  /* Input */
+  .input {
+    font-size: 2rem;
+    height: 50px;
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
+    width: 150px;
+  }
+  img {
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 700px;
+  height: 700px;
+  border: 10px solid #169873;
+  border-radius: 10px;
+
+  }
 }

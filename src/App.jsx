@@ -20,7 +20,27 @@ function App() {
       </div>
       <audio id="alarm" src={cool_alarm} />
       <footer className="App-footer">
-        <p>Created by:Brian Kim &copy; 2021</p>
+        <p>
+          <a
+            className="App-link"
+            href="https://github.com/bibimbop123"
+            rel="noreferrer"
+            target="_blank"
+          >
+            Github
+          </a>
+        </p>
+        <p>
+          <a
+            className="App-link"
+            href="https://www.linkedin.com/in/bibimbop/"
+            rel="noreferrer"
+            target="_blank"
+          >
+            LinkedIn
+          </a>
+        </p>
+        <p>Created by:Brian Kim &copy; 2023</p>
       </footer>
     </div>
   );

@@ -11,7 +11,7 @@ export default function MyStopwatch() {
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = setInterval(() => {
-        setMilliseconds((prevMillis) => prevMillis + 23); // Increment milliseconds by 1
+        setMilliseconds((prevMillis) => prevMillis + 33); // Increment milliseconds by 1
       }, 10);
     } else {
       clearInterval(intervalRef.current);
@@ -43,8 +43,8 @@ export default function MyStopwatch() {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <h1>Stopwatch</h1>
-      <p>
+      <p className="Time-remaining">
+        Time elapsed:
         {formatTime(
           days * 86400000 +
             hours * 3600000 +

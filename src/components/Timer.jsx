@@ -171,30 +171,38 @@ export default function MyTimer() {
   }, [isLoaded]);
 
   return (
-    <div>
+    <div className="timer-component">
       <div>
-        <label htmlFor="days">Days:</label>
+        <label className="label" htmlFor="days">
+          Days:
+        </label>
         <input
           type="number"
           id="days"
           value={selectedDays}
           onChange={handleDaysChange}
         />
-        <label htmlFor="hours">Hours:</label>
+        <label className="label" htmlFor="hours">
+          Hours:
+        </label>
         <input
           type="number"
           id="hours"
           value={selectedHours}
           onChange={handleHoursChange}
         />
-        <label htmlFor="minutes">Minutes:</label>
+        <label className="label" htmlFor="minutes">
+          Minutes:
+        </label>
         <input
           type="number"
           id="minutes"
           value={selectedMinutes}
           onChange={handleMinutesChange}
         />
-        <label htmlFor="seconds">Seconds:</label>
+        <label className="label" htmlFor="seconds">
+          Seconds:
+        </label>
         <input
           type="number"
           id="seconds"
@@ -202,20 +210,40 @@ export default function MyTimer() {
           onChange={handleSecondsChange}
         />
       </div>
+      <br />
+      <br />
       <div>
-        <button onClick={handleStartClick} disabled={isRunning}>
+        <button
+          className="button"
+          onClick={handleStartClick}
+          disabled={isRunning}
+        >
           Start
         </button>
-        <button onClick={handlePauseClick} disabled={!isRunning}>
+        <button
+          className="button"
+          onClick={handlePauseClick}
+          disabled={!isRunning}
+        >
           Pause
         </button>
-        <button onClick={handleResumeClick} disabled={isRunning}>
+        <button
+          className="button"
+          onClick={handleResumeClick}
+          disabled={isRunning}
+        >
           Resume
         </button>
-        <button onClick={handleRestartClick}>Restart</button>
+        <button className="button" onClick={handleRestartClick}>
+          Restart
+        </button>
       </div>
+      <br />
+      <br />
       <div>
-        <p>Time Remaining: {formatTime(timeRemaining)}</p>
+        <p className="Time-remaining">
+          Time Remaining: {formatTime(timeRemaining)}
+        </p>
       </div>
       <audio src={cool_alarm} />
     </div>

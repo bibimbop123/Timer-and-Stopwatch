@@ -78,9 +78,15 @@ export default function MyStopwatch() {
         </p>
       )}
       <p>{isRunning ? "Running" : "Not running"}</p>
-      <button onClick={handleStartClick}>Start</button>
-      <button onClick={handlePauseClick}>Pause</button>
-      <button onClick={handleResetClick}>Reset</button>
+      <button className="button" onClick={handleStartClick}>
+        Start
+      </button>
+      <button className="button" onClick={handlePauseClick}>
+        Pause
+      </button>
+      <button className="button" onClick={handleResetClick}>
+        Reset
+      </button>
     </div>
   );
 }

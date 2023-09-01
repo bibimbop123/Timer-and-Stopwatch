@@ -65,23 +65,25 @@ export default function MyStopwatch() {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <p className="Time-remaining">
-        Time elapsed:
-        {formatTime(
-          days * 86400000 +
-            hours * 3600000 +
-            minutes * 60000 +
-            seconds * 1000 +
-            milliseconds
-        )}
-      </p>
-      {milliseconds > 0 && (
-        <p style={{ fontSize: "14px", color: "gray" }}>
-          Note: Milliseconds may not be accurate due to limitations in timer
-          accuracy.
+      <div className="Stopwatch-remaining-container">
+        <p className="Time-remaining">
+          Time elapsed:
+          {formatTime(
+            days * 86400000 +
+              hours * 3600000 +
+              minutes * 60000 +
+              seconds * 1000 +
+              milliseconds
+          )}
         </p>
-      )}
-      <p>{isRunning ? "Running" : "Not running"}</p>
+        {milliseconds > 0 && (
+          <p style={{ fontSize: "14px", color: "gray" }}>
+            Note: Milliseconds may not be accurate due to limitations in timer
+            accuracy.
+          </p>
+        )}
+        <p>{isRunning ? "Running" : "Not running"}</p>
+      </div>
       <button className="button" onClick={handleStartClick}>
         Start
       </button>

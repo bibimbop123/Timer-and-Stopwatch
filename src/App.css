@@ -114,17 +114,43 @@ body {
 .Time-remaining {
   align-items: center;
   background-color: #9EBD6E;
-  color: white;
+  color: black;
   display: flex;
   flex-grow: 1;
-  font-size: 2rem;
-  height: 150px;
+  font-size: 2.5rem;
+  height: 250px;
   justify-content: center;
   margin: 10px;
   padding: 20px;
   text-align: center;
   width: 100%;
 
+}
+.Time-remaining-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  font-size: 2rem;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+}
+.Stopwatch-remaining-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  flex-wrap: wrap;
+  font-size: 2rem;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
 }
 
 /* Label */
